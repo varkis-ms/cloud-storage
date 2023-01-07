@@ -1,6 +1,7 @@
 from logging import getLogger
 
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 from uvicorn import run
 
 from cloud_storage.config import DefaultSettings
@@ -49,6 +50,8 @@ def get_app() -> FastAPI:
 
 app = get_app()
 
+app.mount("/", StaticFiles(directory="/Users/sergeymarkin/Desktop/Project/OpenSource/cloud-storage/front",
+                           html=True))
 
 if __name__ == "__main__":  # pragma: no cover
     settings_for_application = get_settings()
