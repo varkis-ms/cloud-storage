@@ -9,10 +9,9 @@ api_router = APIRouter(tags=["Work with files"])
 
 
 @api_router.get(
-    "/file",
-    # response_model=PingResponse,
+    "/file/download",
+    response_class=FileResponse,
     status_code=status.HTTP_200_OK,
-    # response_class=FileResponse
 )
 async def health_check():
     return FileResponse("/Users/sergeymarkin/Desktop/Project/OpenSource/cloud-storage/env.sample",

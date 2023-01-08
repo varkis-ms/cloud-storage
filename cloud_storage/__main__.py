@@ -39,7 +39,7 @@ def get_app() -> FastAPI:
         description=description,
         docs_url="/swagger",
         openapi_url="/openapi",
-        version="1.0.0",
+        version="0.1.0",
         openapi_tags=tags_metadata,
     )
     settings = get_settings()
