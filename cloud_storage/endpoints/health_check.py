@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from starlette import status
+from fastapi import status
 
 from cloud_storage.schemas import PingResponse
 

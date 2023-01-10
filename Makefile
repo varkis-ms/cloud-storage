@@ -60,7 +60,7 @@ revision:  ##@Database Create new revision file automatically with prefix (ex. 2
 	cd $(APPLICATION_NAME)/db && alembic revision --autogenerate
 
 open_db:  ##@Database Open database inside docker-image
-	docker exec -it bookmark_postgres psql -d $(POSTGRES_DB) -U $(POSTGRES_USER)
+	docker exec -it cloud_storage_postgres psql -d $(POSTGRES_DB) -U $(POSTGRES_USER)
 
 test:  ##@Testing Test application with pytest
 	make db && $(TEST)

@@ -29,8 +29,12 @@ def get_app() -> FastAPI:
 
     tags_metadata = [
         {
-            "name": "Пока хз",
-            "description": "Напишу тут что-то, но попозже",
+            "name": "Health check",
+            "description": "Health check ручка",
+        },
+        {
+            "name": "Work with files",
+            "description": "Ручки для работы с файлами",
         },
     ]
 

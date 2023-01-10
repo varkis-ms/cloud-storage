@@ -1,11 +1,9 @@
 from fastapi import APIRouter
-from starlette import status
+from fastapi import status
 from fastapi.responses import HTMLResponse
 
-# from cloud_storage.schemas import PingResponse
 
-
-api_router = APIRouter(tags=["Not found "])
+api_router = APIRouter(tags=["Not found"])
 
 
 @api_router.get(
