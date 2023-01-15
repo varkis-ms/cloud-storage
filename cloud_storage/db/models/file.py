@@ -13,11 +13,11 @@ class FileInfo(BaseTable):
         nullable=False,
         doc="Name of file",
     )
-    parent_id = Column(
-        "parent_id",
-        ForeignKey("file_info.id"),
-        nullable=True,
-        doc="Identifier of parent folder",
+    path = Column(
+        "path",
+        TEXT,
+        nullable=False,
+        doc="Path to file",
     )
     owner_id = Column(
         "owner_id",

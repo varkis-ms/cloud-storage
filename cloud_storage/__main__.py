@@ -49,6 +49,9 @@ def get_app() -> FastAPI:
     settings = get_settings()
     bind_routes(application, settings)
     application.state.settings = settings
+    application["info"]["x-logo"] = {
+        "url": "https://www.google.com/url?sa=i&url=https%3A%2F%2Frutube.ru%2Fchannel%2F27218067%2F&psig=AOvVaw06pZkJm0xjwXCcipQhe7Q_&ust=1673834028761000&source=images&cd=vfe&ved=0CBAQjRxqFwoTCPidpue7yPwCFQAAAAAdAAAAABAE"
+    }
     return application
 
 

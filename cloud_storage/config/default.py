@@ -1,6 +1,8 @@
 from os import environ
 
+from fastapi.security import OAuth2PasswordBearer
 from pydantic import BaseSettings
+from passlib.context import CryptContext
 
 
 class DefaultSettings(BaseSettings):
@@ -14,7 +16,7 @@ class DefaultSettings(BaseSettings):
     ENV: str = environ.get("ENV", "local")
     PATH_PREFIX: str = environ.get("PATH_PREFIX", "")  # /api/v1
     APP_HOST: str = environ.get("APP_HOST", "http://127.0.0.1")
-    APP_PORT: int = int(environ.get("APP_PORT", 8080))
+    APP_PORT: int = int(environ.get("APP_PORT", 8000))
 
     POSTGRES_DB: str = environ.get("POSTGRES_DB", "cloud_storage_db")
     POSTGRES_HOST: str = environ.get("POSTGRES_HOST", "localhost")
@@ -23,6 +25,14 @@ class DefaultSettings(BaseSettings):
     POSTGRES_PASSWORD: str = environ.get("POSTGRES_PASSWORD", "123454321")
     DB_CONNECT_RETRY: int = environ.get("DB_CONNECT_RETRY", 20)
     DB_POOL_SIZE: int = environ.get("DB_POOL_SIZE", 15)
+
+    OAUTH2_SCHEME = OAuth2PasswordBearer(tokenUrl=f"{APP_HOST}:{APP_PORT}{PATH_PREFIX}/user/auth")
+
+    SECRET_KEY = environ.get("SECRET_KEY", "681cd60c580805666d038c77fdb5af0bc211523f84693dab1c8302af5867412e")
+    ALGORITHM: str = environ.get("ALGORITHM", "HS256")
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = int(environ.get("ACCESS_TOKEN_EXPIRE_MINUTES", 1440))
+
+    PWD_CONTEXT = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
     @property
     def database_settings(self) -> dict:

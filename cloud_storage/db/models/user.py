@@ -10,9 +10,7 @@ class User(BaseTable):
     username = Column(
         "username",
         TEXT,
-        nullable=False,
-        unique=True,
-        index=True,
+        nullable=True,
         doc="Username for authentication.",
     )
     password = Column(
@@ -25,6 +23,8 @@ class User(BaseTable):
     email = Column(
         "email",
         TEXT,
-        nullable=True,
-        doc="Email for notifications.",
+        nullable=False,
+        unique=True,
+        index=True,
+        doc="Email for authentication and notifications.",
     )

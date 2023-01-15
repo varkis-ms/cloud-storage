@@ -1,0 +1,111 @@
+# `python-base` sets up all our shared environment variables
+FROM python:3.11-slim as python-base
+
+    # python
+ENV PYTHONUNBUFFERED=1 \
+    # prevents python creating .pyc files
+    PYTHONDONTWRITEBYTECODE=1 \
+    \
+    # pip
+    PIP_NO_CACHE_DIR=off \
+    PIP_DISABLE_PIP_VERSION_CHECK=on \
+    PIP_DEFAULT_TIMEOUT=100 \
+    \
+    # poetry
+    # https://python-poetry.org/docs/configuration/#using-environment-variables
+    POETRY_VERSION=1.2.1 \
+    # make poetry install to this location
+    POETRY_HOME="/opt/poetry" \
+    # make poetry create the virtual environment in the project's root
+    # it gets named `.venv`
+    POETRY_VIRTUALENVS_IN_PROJECT=true \
+    # do not ask any interactive question
+    POETRY_NO_INTERACTION=1 \
+    \
+    # paths
+    # this is where our requirements + virtual environment will live
+    PYSETUP_PATH="/opt/pysetup" \
+    VENV_PATH="/opt/pysetup/.venv"
+
+
+# prepend poetry and venv to path
+ENV PATH="$POETRY_HOME/bin:$VENV_PATH/bin:$PATH"
+
+
+# `builder-base` stage is used to build deps + create our virtual environment
+FROM python-base as builder-base
+RUN apt-get update \
+    && apt-get install --no-install-recommends -y \
+        # deps for installing poetry
+        curl \
+        # deps for building python deps
+        build-essential
+
+# install poetry - respects $POETRY_VERSION & $POETRY_HOME
+RUN curl -sSL https://install.python-poetry.org/ | python
+
+# copy project requirement files here to ensure they will be cached.
+WORKDIR $PYSETUP_PATH
+COPY poetry.lock pyproject.toml ./
+
+# install runtime deps - uses $POETRY_VIRTUALENVS_IN_PROJECT internally
+RUN poetry install --only main
+
+
+# `development` image is used during development / testing
+FROM python-base as development
+ENV FASTAPI_ENV=development
+WORKDIR $PYSETUP_PATH
+
+# copy in our built poetry + venv
+COPY --from=builder-base $POETRY_HOME $POETRY_HOME
+COPY --from=builder-base $PYSETUP_PATH $PYSETUP_PATH
+
+# Copying in our entrypoint
+COPY docker-entrypoint.sh /docker-entrypoint.sh
+RUN chmod +x /docker-entrypoint.sh
+
+# quicker install as runtime deps are already installed
+RUN poetry install
+
+# will become mountpoint of our code
+WORKDIR /sending_point
+ENV PYTHONPATH="${PYTHONPATH}:/"
+EXPOSE 80
+CMD ["python", "-m", "sending_point"]
+ENTRYPOINT /docker-entrypoint.sh $0 $@
+
+# `production` image used for runtime
+FROM python-base as production
+ENV FASTAPI_ENV=production
+COPY --from=builder-base $PYSETUP_PATH $PYSETUP_PATH
+
+COPY docker-entrypoint.sh /docker-entrypoint.sh
+RUN chmod +x /docker-entrypoint.sh
+
+
+COPY ./textConfig.json /sending_point/textConfig.json
+RUN chmod +rw /sending_point/textConfig.json
+
+COPY ./key.json /sending_point/key.json
+RUN chmod +r /sending_point/key.json
+
+# Create user with the name poetry
+RUN groupadd -g 1500 poetry && \
+    useradd -m -u 1500 -g poetry poetry
+
+COPY --chown=poetry:poetry ./sending_point /sending_point
+USER poetry
+WORKDIR /sending_point
+
+COPY ./sending_point /sending_point/
+
+
+
+ENV PYTHONPATH="${PYTHONPATH}:/"
+
+CMD ["gunicorn", "-k", "uvicorn.workers.UvicornWorker", "sending_point.__main__:app", "-b", ":80", "--log-level=debug"]
+
+ENTRYPOINT /docker-entrypoint.sh $0 $@
+WORKDIR /sending_point
+
