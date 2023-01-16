@@ -3,7 +3,7 @@ from fastapi.security import OAuth2PasswordBearer
 from fastapi.security import OAuth2PasswordRequestForm
 
 from cloud_storage.schemas import RegistrationForm, RegistrationResponse, RegistrationFormInDb
-from cloud_storage.config.utils import get_settings
+from cloud_storage.config import get_settings
 from cloud_storage.utils.user.business_logic import *
 from cloud_storage.utils.user.auth_db import *
 from cloud_storage.db.models import User
@@ -60,7 +60,7 @@ async def registration(
     user_data = RegistrationFormInDb(**registration_form.dict())
     check_user = await register_user(session, user_data)
     if check_user:
-        create_directory(user_data.email)
+        create_directory(f"{get_settings().STORAGE_PATH}/", user_data.email)
         root_folder = FileInfoSchema(file_name=user_data.email, owner_id=check_user.id)
         check_root = await file_in_db(session, root_folder)
         if check_root:

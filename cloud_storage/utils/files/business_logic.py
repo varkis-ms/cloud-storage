@@ -9,22 +9,35 @@ from cloud_storage.config import get_settings
 settings = get_settings()
 
 
-def create_directory(dir_name: str, path: str = settings.STORAGE_PATH):
-    try:
-        os.mkdir(f"{path}/{dir_name}")
-    except OSError:
-        return f"Failed to create '{dir_name}' directory"
-    else:
-        return f"'{dir_name}' directory successfully created"
+def check_file_type(file_path: str):
+    if os.path.isfile(file_path):
+        return True
+    elif os.path.isdir(file_path):
+        return False
+    raise FileNotFoundError
 
 
-def delete_directory(dir_name: str, path: str = settings.STORAGE_PATH):
+def create_directory(dir_path: str, dir_name: str):
     try:
-        os.rmdir(f"{path}/{dir_name}")
+        os.mkdir(f"{dir_path}{dir_name}")
     except OSError:
-        return f"Failed to delete '{dir_name}' directory"
+        return False
     else:
-        return f"'{dir_name}' directory successfully deleted"
+        return True
+
+
+def delete_file(file_path: str, file_name: str):
+    path_file = f"{file_path}{file_name}"
+    type_file = check_file_type(path_file)
+    try:
+        if type_file:
+            os.remove(path_file)
+        elif not type_file:
+            os.rmdir(path_file)
+    except OSError:
+        return False
+    else:
+        return True
 
 
 def files_in_directory(path: str):
@@ -41,11 +54,12 @@ def zip_files(path: str, dir_name: str):
     return iter([io.getvalue()])
 
 
-def get_file_size(file_path: str):
-    file_path = f"{settings.STORAGE_PATH}{file_path}"
-    return os.path.getsize(file_path)
+def get_file_size(path_file: str):
+    return os.path.getsize(path_file)
 
 
 def get_mime_type(head_file: bytes):
     file_mime_type = from_buffer(head_file, mime=True)
     return file_mime_type
+
+# def delete_file(file_path: str):
