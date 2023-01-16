@@ -1,4 +1,5 @@
-from pydantic import BaseModel, EmailStr, root_validator
+from pydantic import BaseModel, EmailStr, root_validator, Field, validator
+from cloud_storage.config import get_settings
 
 
 class RegistrationForm(BaseModel):
@@ -6,7 +7,7 @@ class RegistrationForm(BaseModel):
     password1: str
     password2: str
 
-    @root_validator(pre=True)
+    @root_validator
     def check_passwords_match(cls, values):
         pw1, pw2 = values.get('password1'), values.get('password2')
         if pw1 is not None and pw2 is not None and pw1 != pw2:
@@ -14,9 +15,14 @@ class RegistrationForm(BaseModel):
         return values
 
 
-class RegistrationFormInDb(RegistrationForm):
+class RegistrationFormInDb(BaseModel):
     email: EmailStr
-    hashed_password: str
+    password: str = Field(alias="password1")
+
+    @validator("password")
+    def validate_password(cls, password):
+        password = get_settings().PWD_CONTEXT.hash(password)
+        return password
 
 
 class RegistrationResponse(BaseModel):

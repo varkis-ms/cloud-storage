@@ -7,8 +7,8 @@ from .base import BaseTable
 class FileInfo(BaseTable):
     __tablename__ = "file_info"
 
-    name = Column(
-        "name",
+    file_name = Column(
+        "file_name",
         TEXT,
         nullable=False,
         doc="Name of file",
@@ -22,10 +22,16 @@ class FileInfo(BaseTable):
     owner_id = Column(
         "owner_id",
         ForeignKey("user.id", ondelete="SET NULL", onupdate="SET NULL"),
-        nullable=True,
+        nullable=False,
         doc="Identifier of user, who own file",
     )
-    extension = Column(
+    path_id = Column(
+        "path_id",
+        ForeignKey("file_info.id", ondelete="SET NULL", onupdate="SET NULL"),
+        nullable=True,
+        doc="Identifier of parent folder",
+    )
+    mime_type = Column(
         "extension",
         TEXT,  # ENUM
         nullable=True,

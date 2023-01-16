@@ -2,7 +2,7 @@ from sqlalchemy import delete, exc, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from cloud_storage.db.models import User
-from cloud_storage.schemas import RegistrationForm
+from cloud_storage.schemas import RegistrationFormInDb
 
 
 async def get_user(session: AsyncSession, email: str) -> User | None:
@@ -10,11 +10,11 @@ async def get_user(session: AsyncSession, email: str) -> User | None:
     return await session.scalar(query)
 
 
-async def register_user(session: AsyncSession, possible_user: RegistrationForm) -> bool:
-    user = User(email=possible_user["email"], password=possible_user["password"])
+async def register_user(session: AsyncSession, possible_user: RegistrationFormInDb) -> bool | User:
+    user = User(**possible_user.dict())
     session.add(user)
     try:
         await session.commit()
     except exc.IntegrityError:
         return False
-    return True
+    return user

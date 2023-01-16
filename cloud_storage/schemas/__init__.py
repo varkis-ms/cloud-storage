@@ -1,12 +1,17 @@
 from .health_check import PingResponse
-from .files import BaseFile
 from .user import User
-from .registration import RegistrationForm
+from .registration import RegistrationForm, RegistrationFormInDb, RegistrationResponse
+from .token import Token, TokenData
+from .files import FileInfoSchema
 
 
 __all__ = [
     "PingResponse",
-    "BaseFile",
     "User",
     "RegistrationForm",
+    "RegistrationFormInDb",
+    "RegistrationResponse",
+    "Token",
+    "TokenData",
+    "FileInfoSchema",
 ]

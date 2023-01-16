@@ -1,8 +1,8 @@
 """initial
 
-Revision ID: 6cf7de411094
+Revision ID: 449fa3d9fffc
 Revises: 
-Create Date: 2023-01-15 03:28:24.374249
+Create Date: 2023-01-16 16:00:09.868381
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision = '6cf7de411094'
+revision = '449fa3d9fffc'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -34,12 +34,14 @@ def upgrade() -> None:
     sa.Column('id', postgresql.UUID(as_uuid=True), server_default=sa.text('gen_random_uuid()'), nullable=False),
     sa.Column('dt_created', postgresql.TIMESTAMP(timezone=True), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=False),
     sa.Column('dt_updated', postgresql.TIMESTAMP(timezone=True), server_default=sa.text('CURRENT_TIMESTAMP'), nullable=False),
-    sa.Column('name', sa.TEXT(), nullable=False),
+    sa.Column('file_name', sa.TEXT(), nullable=False),
     sa.Column('path', sa.TEXT(), nullable=False),
-    sa.Column('owner_id', postgresql.UUID(as_uuid=True), nullable=True),
+    sa.Column('owner_id', postgresql.UUID(as_uuid=True), nullable=False),
+    sa.Column('path_id', postgresql.UUID(as_uuid=True), nullable=True),
     sa.Column('extension', sa.TEXT(), nullable=True),
     sa.Column('size', sa.FLOAT(), server_default=sa.text('null'), nullable=True),
     sa.ForeignKeyConstraint(['owner_id'], ['user.id'], name=op.f('fk__file_info__owner_id__user'), onupdate='SET NULL', ondelete='SET NULL'),
+    sa.ForeignKeyConstraint(['path_id'], ['file_info.id'], name=op.f('fk__file_info__path_id__file_info'), onupdate='SET NULL', ondelete='SET NULL'),
     sa.PrimaryKeyConstraint('id', name=op.f('pk__file_info')),
     sa.UniqueConstraint('id', name=op.f('uq__file_info__id'))
     )

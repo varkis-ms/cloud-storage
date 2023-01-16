@@ -34,6 +34,9 @@ class DefaultSettings(BaseSettings):
 
     PWD_CONTEXT = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
+    STORAGE_PATH: str = environ.get("STORAGE_PATH", "/Users/sergeymarkin/Desktop/Project/OpenSource/cloud-storage"
+                                                    "/cloud_storage/storage_users")
+
     @property
     def database_settings(self) -> dict:
         """

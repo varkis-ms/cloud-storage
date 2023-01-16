@@ -9,11 +9,7 @@ from cloud_storage.config import get_settings
 from cloud_storage.db.connection import get_session
 from cloud_storage.db.models import User
 from cloud_storage.utils.user.auth_db import *
-from cloud_storage.schemas.token import *
-
-
-def encode_password(password: str) -> str:
-    return get_settings().PWD_CONTEXT.hash(password)
+from cloud_storage.schemas import TokenData
 
 
 def verify_password(

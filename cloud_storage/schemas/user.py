@@ -4,8 +4,9 @@ from pydantic import BaseModel, EmailStr, constr
 
 
 class User(BaseModel):
-    username: str | None
+    username: str | None = None
     email: EmailStr
+    # disabled: bool | None = None
     dt_created: datetime
     dt_updated: datetime
 
